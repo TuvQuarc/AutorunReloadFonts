@@ -24,7 +24,7 @@ namespace {
     constexpr UINT WM_RELOAD_FONTS = WM_USER + 21;
 }
 
-int ReloadFonts([[maybe_unused]] int nCommand,[[maybe_unused]] LPVOID pData)
+int ReloadFonts(int nCommand, LPVOID pData)
 {
     if (tc_hwnd)
     {
