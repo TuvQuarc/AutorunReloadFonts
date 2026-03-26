@@ -1,0 +1,43 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Build x86
+      run: msbuild /m /p:Configuration=Release /p:Platform=x86 AutorunReloadFonts.sln
+
+    - name: Build x64
+      run: msbuild /m /p:Configuration=Release /p:Platform=x64 AutorunReloadFonts.sln
+
+    - name: Prepare Release Folder
+      run: |
+        mkdir release_dist
+        copy Release\AutorunReloadFonts.dll release_dist\
+        copy x64\Release\AutorunReloadFonts.dll release_dist\AutorunReloadFonts.dll64
+
+    - name: Create Zip
+      shell: pwsh
+      run: Compress-Archive -Path release_dist\* -DestinationPath AutorunReloadFonts.zip
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: AutorunReloadFonts.zip
+        name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
