@@ -25,17 +25,10 @@ jobs:
       run: msbuild /m /p:Configuration=Release /p:Platform=x64 AutorunReloadFonts.sln
 
     - name: Prepare Release Folder
-      shell: pwsh
       run: |
         mkdir release_dist
-        $dll32 = Get-ChildItem -Path . -Filter "AutorunReloadFonts.dll" -Recurse | Where-Object { $_.FullName -like "*Release*" -and $_.FullName -notlike "*x64*" } | Select-Object -First 1
-        $dll64 = Get-ChildItem -Path . -Filter "AutorunReloadFonts.dll" -Recurse | Where-Object { $_.FullName -like "*Release*" -and $_.FullName -like "*x64*" } | Select-Object -First 1
-        
-        if ($dll32) { Copy-Item $dll32.FullName -Destination "release_dist\AutorunReloadFonts.dll" }
-        else { throw "32-bit DLL not found!" }
-        
-        if ($dll64) { Copy-Item $dll64.FullName -Destination "release_dist\AutorunReloadFonts.dll64" }
-        else { throw "64-bit DLL not found!" }
+        copy Release\AutorunReloadFonts.dll release_dist\
+        copy x64\Release\AutorunReloadFonts.dll release_dist\AutorunReloadFonts.dll64
 
     - name: Create Zip
       shell: pwsh
